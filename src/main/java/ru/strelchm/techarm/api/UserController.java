@@ -1,13 +1,16 @@
 package ru.strelchm.techarm.api;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.strelchm.techarm.dto.IdDto;
-import ru.strelchm.techarm.dto.UserContext;
-import ru.strelchm.techarm.dto.UserDto;
+import ru.strelchm.techarm.dto.*;
 import ru.strelchm.techarm.exception.AccessDeniedException;
 import ru.strelchm.techarm.exception.BadRequestException;
 import ru.strelchm.techarm.service.UserService;
@@ -16,10 +19,13 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
+import static ru.strelchm.techarm.config.OpenApiConfig.SUCCESS_MESSAGE_FIELD;
+
 @RestController
 //@Api("REST controller 4 user operations")
 @RequestMapping("/api/users")
 @Validated
+@Tag(name = "/api/users", description = "User operations")
 //@PreAuthorize("hasAnyRole()") todo - держать открытой регистрацию
 public class UserController extends ParentController {
     private final UserService userService;
@@ -31,8 +37,14 @@ public class UserController extends ParentController {
     }
 
     @GetMapping
-    public List<UserDto> getAllUsers() {
-        return userService.getAll();
+    @ApiResponse(description = "Successful Operation", responseCode = "200")
+    @Operation(
+            summary = "Get all users", responses = @ApiResponse(
+            responseCode = "200", description = SUCCESS_MESSAGE_FIELD,
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserListDto.class))
+    ))
+    public UserListDto getAllUsers() {
+        return new UserListDto(userService.getAll());
     }
 
     @GetMapping("/{id}")
