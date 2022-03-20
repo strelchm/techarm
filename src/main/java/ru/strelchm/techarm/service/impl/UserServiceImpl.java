@@ -49,6 +49,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UUID add(UserDto dto) {
+        if (userRepository.findByLogin(dto.getLogin()).isPresent()) {
+            throw new BadRequestException(String.format("User with login %s existed", dto.getLogin()));
+        }
         if (dto.getUserAppRole() == null) {
             dto.setUserAppRole(UserAppRole.CLIENT);
         } else if (dto.getUserAppRole() == UserAppRole.ADMIN) {
@@ -56,8 +59,6 @@ public class UserServiceImpl implements UserService {
         }
         dto.setPassword(encoder.encode(dto.getPassword()));
         dto.setStatus(UserStatus.ACTIVE);
-        System.out.println(dto);
-        System.out.println(mappingUtil.mapToUserEntity(dto));
         User user = userRepository.save(mappingUtil.mapToUserEntity(dto));
         return userRepository.save(user).getId();
     }

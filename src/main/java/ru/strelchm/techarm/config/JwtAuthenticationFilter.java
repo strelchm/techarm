@@ -1,5 +1,7 @@
 package ru.strelchm.techarm.config;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -39,7 +41,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authorizationHeader.replace(TOKEN_PREFIX, "");
-        UserDto userPrincipal = tokenService.parseToken(token);
+
+        try {
+            UserDto userPrincipal = tokenService.parseToken(token);
 
 //        if(blockedUserRepository.findById(userPrincipal.getId()).isPresent()) {
 //            httpServletResponse.setStatus(HttpStatus.FORBIDDEN.value());
@@ -47,8 +51,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //            return;
 //        }
 
-        SecurityContextHolder.getContext().setAuthentication(createToken(userPrincipal));
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
+            SecurityContextHolder.getContext().setAuthentication(createToken(userPrincipal));
+            filterChain.doFilter(httpServletRequest, httpServletResponse);
+        } catch (ExpiredJwtException e) {
+            httpServletResponse.setStatus(HttpStatus.FORBIDDEN.value());
+            httpServletResponse.getWriter().write("Token expired");
+        }
     }
 
     private boolean authorizationHeaderIsInvalid(String authorizationHeader) {

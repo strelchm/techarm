@@ -1,5 +1,6 @@
 package ru.strelchm.techarm.api;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -37,7 +38,7 @@ public class ParentController {
         return getResponseFromException(ex);
     }
 
-    @ExceptionHandler({AccessDeniedException.class, org.springframework.security.access.AccessDeniedException.class})
+    @ExceptionHandler({AccessDeniedException.class, org.springframework.security.access.AccessDeniedException.class, ExpiredJwtException.class})
     @ResponseStatus(value = HttpStatus.FORBIDDEN)
     public HashMap<String, String> handleAccessDeniedExceptions(Exception ex) {
         return getResponseFromException(ex);
