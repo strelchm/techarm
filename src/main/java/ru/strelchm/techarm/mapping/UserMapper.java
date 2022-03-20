@@ -8,7 +8,6 @@ import ru.strelchm.techarm.dto.UserDto;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-//    @Mapping(target = "password", expression = "java(null)")
     UserDto toDto(User user);
 
     User fromDto(UserDto dto);

@@ -11,7 +11,7 @@ import ru.strelchm.techarm.dto.UserDto;
 import ru.strelchm.techarm.exception.AccessDeniedException;
 import ru.strelchm.techarm.exception.BadRequestException;
 import ru.strelchm.techarm.exception.NotFoundException;
-import ru.strelchm.techarm.mapping.MappingUtil;
+import ru.strelchm.techarm.mapping.UserMapper;
 import ru.strelchm.techarm.service.UserService;
 
 import java.util.List;
@@ -23,18 +23,18 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
-    private final MappingUtil mappingUtil;
+    private final UserMapper userMapper;
 
     @Autowired
-    public UserServiceImpl(UserRepository repository, PasswordEncoder encoder, MappingUtil mappingUtil) {
+    public UserServiceImpl(UserRepository repository, PasswordEncoder encoder, UserMapper userMapper) {
         this.userRepository = repository;
         this.encoder = encoder;
-        this.mappingUtil = mappingUtil;
+        this.userMapper = userMapper;
     }
 
     @Override
     public List<UserDto> getAll() {
-        return userRepository.findAll().stream().map(mappingUtil::mapToUserDto).collect(Collectors.toList());
+        return userRepository.findAll().stream().map(userMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getById(UUID id) {
-        return mappingUtil.mapToUserDto(getUserById(id));
+        return userMapper.toDto(getUserById(id));
     }
 
     @Override
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
         }
         dto.setPassword(encoder.encode(dto.getPassword()));
         dto.setStatus(UserStatus.ACTIVE);
-        User user = userRepository.save(mappingUtil.mapToUserEntity(dto));
+        User user = userRepository.save(userMapper.fromDto(dto));
         return userRepository.save(user).getId();
     }
 
@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
 //            }
         }
 
-        return mappingUtil.mapToUserDto(userRepository.save(user));
+        return userMapper.toDto(userRepository.save(user));
     }
 
     @Override
@@ -134,6 +134,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<UserDto> getUserByLogin(String login) {
         User user = userRepository.findByLogin(login).orElseThrow(() -> new NotFoundException("User with login " + login + " not found"));
-        return Optional.ofNullable(mappingUtil.mapToUserDto(user));
+        return Optional.ofNullable(userMapper.toDto(user));
     }
 }
