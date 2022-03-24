@@ -59,7 +59,7 @@ public class UserController extends ParentController {
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
-    @Secured({"ROLE_CLIENT", "ROLE_ADMIN"})
+//    @Secured({"ROLE_CLIENT", "ROLE_ADMIN"})
     public IdDto createUser(@NotNull(message = NULL_CREATE_OBJECT_REQUEST_EXCEPTION) @Validated @RequestBody UserDto dto) {
         return new IdDto(userService.add(dto));
     }
