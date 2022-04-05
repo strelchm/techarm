@@ -35,6 +35,12 @@ public class DeviceModelServiceImpl implements DeviceModelService {
 
     @Override
     public UUID add(DeviceModel deviceModel, UserDto userDto) {
+        if (deviceModel.getName() == null) {
+            throw new BadRequestException("Device model name not existed");
+        }
+        if (deviceModel.getManufacture() == null) {
+            throw new BadRequestException("Manufacture not existed");
+        }
         if (devModelRepository.findByName(deviceModel.getName()).isPresent()) {
             throw new BadRequestException(String.format("Device model with name %s existed", deviceModel.getName()));
         }

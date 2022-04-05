@@ -1,6 +1,7 @@
 package ru.strelchm.techarm.api;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -68,7 +69,7 @@ public class DeviceController extends ParentController {
     @PatchMapping("/{id}")
     public DeviceDto patchDevice(@NotNull(message = NULL_ID_REQUEST_EXCEPTION) @Validated @PathVariable UUID id,
                                  @NotNull(message = NULL_PATCH_OBJECT_REQUEST_EXCEPTION) @Validated @RequestBody DeviceDto dto,
-                                 @ModelAttribute(USER_CONTEXT) UserContext userContext) {
+                                 @ModelAttribute(USER_CONTEXT) @Parameter(hidden = true)  UserContext userContext) {
         if (dto.getId() == null) {
             dto.setId(id);
         } else if (!id.equals(dto.getId())) {
@@ -82,7 +83,7 @@ public class DeviceController extends ParentController {
     @DeleteMapping("/{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void deleteDevice(@NotNull(message = NULL_ID_REQUEST_EXCEPTION) @Validated @PathVariable UUID id,
-                             @ModelAttribute(USER_CONTEXT) UserContext userContext) {
+                             @ModelAttribute(USER_CONTEXT) @Parameter(hidden = true)  UserContext userContext) {
         deviceService.delete(id, userContext.getUser().orElseThrow(AccessDeniedException::new));
     }
 }

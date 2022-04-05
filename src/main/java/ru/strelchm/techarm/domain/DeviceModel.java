@@ -23,11 +23,11 @@ import javax.validation.constraints.Size;
 public class DeviceModel extends ParentEntity {
     @NotNull
     @Column(unique = true)
-    @Pattern(regexp = "\\S{2,50}")
+//    @Pattern(regexp = "\\S{2,50}")
     private String name;
 
     @NotNull
-    @Size(min = 8, max = 100)
+//    @Size(min = 8, max = 100)
     private String manufacture;
 
     private String imageSrc;
