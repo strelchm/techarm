@@ -62,7 +62,7 @@ public class DeviceController extends ParentController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @Secured({"ROLE_CLIENT", "ROLE_ADMIN"})
     public IdDto createDevice(@NotNull(message = NULL_CREATE_OBJECT_REQUEST_EXCEPTION) @Validated @RequestBody DeviceDto dto,
-                              @ModelAttribute(USER_CONTEXT) UserContext userContext) {
+                              @ModelAttribute(USER_CONTEXT) @Parameter(hidden = true) UserContext userContext) {
         return new IdDto(deviceService.add(deviceMapper.fromDeviceDto(dto), userContext.getUser().get()));
     }
 
