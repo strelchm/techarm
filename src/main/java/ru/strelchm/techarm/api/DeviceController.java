@@ -11,10 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.strelchm.techarm.dto.DeviceDto;
-import ru.strelchm.techarm.dto.DeviceListDto;
-import ru.strelchm.techarm.dto.IdDto;
-import ru.strelchm.techarm.dto.UserContext;
+import ru.strelchm.techarm.dto.*;
 import ru.strelchm.techarm.exception.AccessDeniedException;
 import ru.strelchm.techarm.exception.BadRequestException;
 import ru.strelchm.techarm.mapping.DeviceMapper;
@@ -47,15 +44,15 @@ public class DeviceController extends ParentController {
     @Operation(
             summary = "Get all users", responses = @ApiResponse(
             responseCode = "200", description = SUCCESS_MESSAGE_FIELD,
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeviceListDto.class))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeviceResponseListDto.class))
     ))
-    public DeviceListDto getAllDevices() {
-        return new DeviceListDto(deviceService.getAll().stream().map(deviceMapper::toDeviceDto).collect(Collectors.toList()));
+    public DeviceResponseListDto getAllDevices() {
+        return new DeviceResponseListDto(deviceService.getAll().stream().map(deviceMapper::toDeviceResponseDto).collect(Collectors.toList()));
     }
 
     @GetMapping("/{id}")
-    public DeviceDto getDeviceById(@NotNull(message = NULL_ID_REQUEST_EXCEPTION) @Validated @PathVariable UUID id) {
-        return deviceMapper.toDeviceDto(deviceService.getById(id));
+    public DeviceResponseDto getDeviceById(@NotNull(message = NULL_ID_REQUEST_EXCEPTION) @Validated @PathVariable UUID id) {
+        return deviceMapper.toDeviceResponseDto(deviceService.getById(id));
     }
 
     @PostMapping
@@ -63,20 +60,20 @@ public class DeviceController extends ParentController {
     @Secured({"ROLE_CLIENT", "ROLE_ADMIN"})
     public IdDto createDevice(@NotNull(message = NULL_CREATE_OBJECT_REQUEST_EXCEPTION) @Validated @RequestBody DeviceDto dto,
                               @ModelAttribute(USER_CONTEXT) @Parameter(hidden = true) UserContext userContext) {
-        return new IdDto(deviceService.add(deviceMapper.fromDeviceDto(dto), userContext.getUser().get()));
+        return new IdDto(deviceService.add(deviceMapper.fromDeviceDto(dto), dto.getModelId(), userContext.getUser().get()));
     }
 
     @PatchMapping("/{id}")
-    public DeviceDto patchDevice(@NotNull(message = NULL_ID_REQUEST_EXCEPTION) @Validated @PathVariable UUID id,
-                                 @NotNull(message = NULL_PATCH_OBJECT_REQUEST_EXCEPTION) @Validated @RequestBody DeviceDto dto,
-                                 @ModelAttribute(USER_CONTEXT) @Parameter(hidden = true)  UserContext userContext) {
+    public DeviceResponseDto patchDevice(@NotNull(message = NULL_ID_REQUEST_EXCEPTION) @Validated @PathVariable UUID id,
+                                         @NotNull(message = NULL_PATCH_OBJECT_REQUEST_EXCEPTION) @Validated @RequestBody DeviceDto dto,
+                                         @ModelAttribute(USER_CONTEXT) @Parameter(hidden = true)  UserContext userContext) {
         if (dto.getId() == null) {
             dto.setId(id);
         } else if (!id.equals(dto.getId())) {
             throw new BadRequestException();
         }
-        return deviceMapper.toDeviceDto(
-                deviceService.edit(deviceMapper.fromDeviceDto(dto), userContext.getUser().orElseThrow(AccessDeniedException::new))
+        return deviceMapper.toDeviceResponseDto(
+                deviceService.edit(deviceMapper.fromDeviceDto(dto), dto.getModelId(), userContext.getUser().orElseThrow(AccessDeniedException::new))
         );
     }
 

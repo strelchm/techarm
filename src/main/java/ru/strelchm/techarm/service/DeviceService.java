@@ -11,9 +11,9 @@ public interface DeviceService {
 
     Device getById(UUID id);
 
-    UUID add(Device device, UserDto userDto);
+    UUID add(Device device, UUID deviceModelId, UserDto userDto);
 
-    Device edit(Device dto, UserDto userDto);
+    Device edit(Device dto, UUID deviceModelId, UserDto userDto);
 
     void delete(UUID id, UserDto userDto);
 }

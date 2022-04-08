@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DeviceListDto {
+public class DeviceResponseListDto {
     @NotNull
-    private List<DeviceDto> devices;
+    private List<DeviceResponseDto> devices;
 }

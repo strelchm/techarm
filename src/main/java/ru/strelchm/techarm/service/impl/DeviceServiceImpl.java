@@ -3,6 +3,8 @@ package ru.strelchm.techarm.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.strelchm.techarm.domain.Device;
+import ru.strelchm.techarm.domain.DeviceModel;
+import ru.strelchm.techarm.domain.repo.DeviceModelRepository;
 import ru.strelchm.techarm.domain.repo.DeviceRepository;
 import ru.strelchm.techarm.dto.UserAppRole;
 import ru.strelchm.techarm.dto.UserDto;
@@ -17,10 +19,12 @@ import java.util.UUID;
 @Service
 public class DeviceServiceImpl implements DeviceService {
     private final DeviceRepository deviceRepository;
+    private final DeviceModelRepository deviceModelRepository;
 
     @Autowired
-    public DeviceServiceImpl(DeviceRepository deviceRepository) {
+    public DeviceServiceImpl(DeviceRepository deviceRepository, DeviceModelRepository deviceModelRepository) {
         this.deviceRepository = deviceRepository;
+        this.deviceModelRepository = deviceModelRepository;
     }
 
     @Override
@@ -34,21 +38,26 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public UUID add(Device device, UserDto userDto) {
+    public UUID add(Device device, UUID deviceModelId,  UserDto userDto) {
         if (device.getName() == null) {
             throw new BadRequestException("Device name not existed");
         }
-        if (device.getModelId() == null) {
+        if (deviceModelId == null) {
             throw new BadRequestException("Model id not existed");
         }
         if (deviceRepository.findByName(device.getName()).isPresent()) {
             throw new BadRequestException(String.format("Device with name %s existed", device.getName()));
         }
+        DeviceModel model = deviceModelRepository.findById(deviceModelId).orElse(null);
+        if (model == null) {
+            throw new BadRequestException("Model id not found");
+        }
+        device.setModel(model);
         return deviceRepository.save(device).getId();
     }
 
     @Override
-    public Device edit(Device dto, UserDto userDto) {
+    public Device edit(Device dto, UUID deviceModelId, UserDto userDto) {
         if (userDto.getUserAppRole() != UserAppRole.ADMIN) { // редактировать можно только админу
             throw new AccessDeniedException();
         }
@@ -59,8 +68,12 @@ public class DeviceServiceImpl implements DeviceService {
             device.setName(dto.getName());
         }
 
-        if (dto.getModelId() != null && !device.getModelId().equals(dto.getModelId())) {
-            device.setModelId(dto.getModelId());
+        if (deviceModelId != null && !device.getModel().getId().equals(deviceModelId)) {
+            DeviceModel model = deviceModelRepository.findById(deviceModelId).orElse(null);
+            if (model == null) {
+                throw new BadRequestException("Model id not found");
+            }
+            device.setModel(model);
         }
 
         return deviceRepository.save(device);

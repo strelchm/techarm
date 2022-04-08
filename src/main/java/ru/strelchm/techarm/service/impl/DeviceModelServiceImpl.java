@@ -41,6 +41,9 @@ public class DeviceModelServiceImpl implements DeviceModelService {
         if (deviceModel.getManufacture() == null) {
             throw new BadRequestException("Manufacture not existed");
         }
+        if (deviceModel.getDeviceTypeKey() == null) {
+            throw new BadRequestException("Device type key not existed");
+        }
         if (devModelRepository.findByName(deviceModel.getName()).isPresent()) {
             throw new BadRequestException(String.format("Device model with name %s existed", deviceModel.getName()));
         }
@@ -60,6 +63,11 @@ public class DeviceModelServiceImpl implements DeviceModelService {
 
         if (dto.getName() != null && !deviceModel.getName().equals(dto.getName())) {
             deviceModel.setName(dto.getName());
+        }
+
+        if (dto.getDeviceTypeKey() != null && (deviceModel.getDeviceTypeKey() == null ||
+                !deviceModel.getDeviceTypeKey().equals(dto.getDeviceTypeKey()))) {
+            deviceModel.setDeviceTypeKey(dto.getDeviceTypeKey());
         }
 
         if (dto.getManufacture() != null && !deviceModel.getManufacture().equals(dto.getManufacture())) {

@@ -10,18 +10,14 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeviceModelDto {
+public class DeviceResponseDto {
     private UUID id;
 
     private String name;
 
-    private String manufacture;
+    private DeviceModelDto model;
 
-    private String imageSrc;
-
-    private String deviceTypeKey;
-
-    private String docsSrc;
+    private Date lastParsedDate;
 
     private Date created;
 

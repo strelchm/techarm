@@ -30,6 +30,10 @@ public class DeviceModel extends ParentEntity {
 //    @Size(min = 8, max = 100)
     private String manufacture;
 
+    @NotNull
+//    @Size(min = 8, max = 100)
+    private String deviceTypeKey;
+
     private String imageSrc;
 
     private String docsSrc;

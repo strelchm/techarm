@@ -69,6 +69,4 @@ public class OpenApiConfig implements WebMvcConfigurer {
                                 )
                 );
     }
-
-
 }
