@@ -5,10 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.UUID;
 
 /**
  * Данные устройства
@@ -20,11 +18,15 @@ import java.util.UUID;
 @AllArgsConstructor
 @Table(name = "raw_data")
 public class RawData extends ParentEntity {
+    @OneToOne
+    @JoinColumn(name = "device_id")
     @NotNull
-    private UUID deviceId;
+    private Device device;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     @NotNull
-    private UUID userId;
+    private User user;
 
     private RawDataStatus status;
 

@@ -59,7 +59,7 @@ public class RawDataController extends ParentController {
     @Secured({"ROLE_CLIENT", "ROLE_ADMIN"})
     public IdDto createRawData(@NotNull(message = NULL_CREATE_OBJECT_REQUEST_EXCEPTION) @Validated @RequestBody RawDataDto dto,
                                @ModelAttribute(USER_CONTEXT) @Parameter(hidden = true)  UserContext userContext) {
-        return new IdDto(rawDataService.add(rawDataMapper.fromRawDataDto(dto), userContext.getUser().get()));
+        return new IdDto(rawDataService.add(dto, userContext.getUser().get()));
     }
 
     @PostMapping("/{id}/status")

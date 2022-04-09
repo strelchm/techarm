@@ -2,6 +2,7 @@ package ru.strelchm.techarm.service;
 
 import ru.strelchm.techarm.domain.RawData;
 import ru.strelchm.techarm.domain.RawDataStatus;
+import ru.strelchm.techarm.dto.RawDataDto;
 import ru.strelchm.techarm.dto.UserDto;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public interface RawDataService {
 
     RawData getById(UUID id);
 
-    UUID add(RawData device, UserDto userDto);
+    UUID add(RawDataDto rawDataDto, UserDto userDto);
 
     RawData setStatus(RawData rawData, RawDataStatus status);
 
