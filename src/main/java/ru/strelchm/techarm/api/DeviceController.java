@@ -7,10 +7,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.strelchm.techarm.domain.Device;
 import ru.strelchm.techarm.dto.*;
 import ru.strelchm.techarm.exception.AccessDeniedException;
 import ru.strelchm.techarm.exception.BadRequestException;
@@ -18,7 +21,10 @@ import ru.strelchm.techarm.mapping.DeviceMapper;
 import ru.strelchm.techarm.service.DeviceService;
 import ru.strelchm.techarm.service.UserService;
 
+import javax.persistence.criteria.Predicate;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -46,8 +52,24 @@ public class DeviceController extends ParentController {
             responseCode = "200", description = SUCCESS_MESSAGE_FIELD,
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeviceResponseListDto.class))
     ))
-    public DeviceResponseListDto getAllDevices() {
-        return new DeviceResponseListDto(deviceService.getAll().stream().map(deviceMapper::toDeviceResponseDto).collect(Collectors.toList()));
+    public DeviceResponseListDto getAllDevices(@RequestParam(value = "offset", required = false, defaultValue = DEFAULT_OFFSET) Integer offset,
+                                               @RequestParam(value = "count", required = false, defaultValue = DEFAULT_PAGE_SIZE) Integer count,
+                                               @RequestParam(value = "name", required = false) String name) {
+        Page<Device> devices = deviceService.getAll(getDeviceSpecification(name), new OffsetBasedPageRequest(offset, count));
+        return new DeviceResponseListDto(
+                devices.getContent().stream().map(deviceMapper::toDeviceResponseDto).collect(Collectors.toList()),
+                devices.getTotalElements()
+        );
+    }
+
+    Specification<Device> getDeviceSpecification(String name) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (name != null) {
+                predicates.add(cb.like(cb.lower(root.get("name")), name.toLowerCase() + "%"));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
     }
 
     @GetMapping("/{id}")
@@ -66,7 +88,7 @@ public class DeviceController extends ParentController {
     @PatchMapping("/{id}")
     public DeviceResponseDto patchDevice(@NotNull(message = NULL_ID_REQUEST_EXCEPTION) @Validated @PathVariable UUID id,
                                          @NotNull(message = NULL_PATCH_OBJECT_REQUEST_EXCEPTION) @Validated @RequestBody DeviceDto dto,
-                                         @ModelAttribute(USER_CONTEXT) @Parameter(hidden = true)  UserContext userContext) {
+                                         @ModelAttribute(USER_CONTEXT) @Parameter(hidden = true) UserContext userContext) {
         if (dto.getId() == null) {
             dto.setId(id);
         } else if (!id.equals(dto.getId())) {
@@ -80,7 +102,7 @@ public class DeviceController extends ParentController {
     @DeleteMapping("/{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void deleteDevice(@NotNull(message = NULL_ID_REQUEST_EXCEPTION) @Validated @PathVariable UUID id,
-                             @ModelAttribute(USER_CONTEXT) @Parameter(hidden = true)  UserContext userContext) {
+                             @ModelAttribute(USER_CONTEXT) @Parameter(hidden = true) UserContext userContext) {
         deviceService.delete(id, userContext.getUser().orElseThrow(AccessDeniedException::new));
     }
 }

@@ -13,4 +13,6 @@ import java.util.List;
 public class DeviceModelListDto {
     @NotNull
     private List<DeviceModelDto> models;
+    @NotNull
+    private Long count;
 }

@@ -13,4 +13,6 @@ import java.util.List;
 public class DeviceResponseListDto {
     @NotNull
     private List<DeviceResponseDto> devices;
+    @NotNull
+    private Long count;
 }

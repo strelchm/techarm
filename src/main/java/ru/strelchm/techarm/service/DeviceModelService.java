@@ -1,15 +1,17 @@
 package ru.strelchm.techarm.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.strelchm.techarm.domain.DeviceModel;
 import ru.strelchm.techarm.dto.UserDto;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
 public interface DeviceModelService {
-    List<DeviceModel> getAll();
+    Page<DeviceModel> getAll(Specification<DeviceModel> deviceSpecification, Pageable pageable);
 
     DeviceModel getById(UUID id);
 

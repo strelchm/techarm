@@ -7,10 +7,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.strelchm.techarm.domain.DeviceModel;
 import ru.strelchm.techarm.dto.DeviceModelDto;
 import ru.strelchm.techarm.dto.DeviceModelListDto;
 import ru.strelchm.techarm.dto.IdDto;
@@ -21,7 +24,10 @@ import ru.strelchm.techarm.mapping.DeviceModelMapper;
 import ru.strelchm.techarm.service.DeviceModelService;
 import ru.strelchm.techarm.service.UserService;
 
+import javax.persistence.criteria.Predicate;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -49,8 +55,24 @@ public class DevModelController extends ParentController {
             responseCode = "200", description = SUCCESS_MESSAGE_FIELD,
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeviceModelListDto.class))
     ))
-    public DeviceModelListDto getAllDeviceModels() {
-        return new DeviceModelListDto(deviceModelService.getAll().stream().map(deviceModelMapper::toDeviceModelDto).collect(Collectors.toList()));
+    public DeviceModelListDto getAllDeviceModels(@RequestParam(value = "offset", required = false, defaultValue = DEFAULT_OFFSET) Integer offset,
+                                                 @RequestParam(value = "count", required = false, defaultValue = DEFAULT_PAGE_SIZE) Integer count,
+                                                 @RequestParam(value = "name", required = false) String name) {
+        Page<DeviceModel> devices = deviceModelService.getAll(getDeviceModelSpecification(name), new OffsetBasedPageRequest(offset, count));
+        return new DeviceModelListDto(
+                devices.getContent().stream().map(deviceModelMapper::toDeviceModelDto).collect(Collectors.toList()),
+                devices.getTotalElements()
+        );
+    }
+
+    Specification<DeviceModel> getDeviceModelSpecification(String name) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (name != null) {
+                predicates.add(cb.like(cb.lower(root.get("name")), name.toLowerCase() + "%"));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
     }
 
     @GetMapping("/{id}")

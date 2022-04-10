@@ -1,6 +1,9 @@
 package ru.strelchm.techarm.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.strelchm.techarm.domain.DeviceModel;
 import ru.strelchm.techarm.domain.repo.DeviceModelRepository;
@@ -11,7 +14,6 @@ import ru.strelchm.techarm.exception.BadRequestException;
 import ru.strelchm.techarm.exception.NotFoundException;
 import ru.strelchm.techarm.service.DeviceModelService;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -23,9 +25,8 @@ public class DeviceModelServiceImpl implements DeviceModelService {
         this.devModelRepository = repository;
     }
 
-    @Override
-    public List<DeviceModel> getAll() {
-        return devModelRepository.findAll();
+    public Page<DeviceModel> getAll(Specification<DeviceModel> deviceModelSpecification, Pageable pageable) {
+        return devModelRepository.findAll(deviceModelSpecification, pageable);
     }
 
     @Override
