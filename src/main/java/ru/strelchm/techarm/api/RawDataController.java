@@ -84,14 +84,14 @@ public class RawDataController extends ParentController {
     public RawDataDto changeStatus(@NotNull(message = NULL_ID_REQUEST_EXCEPTION) @Validated @PathVariable UUID id,
                                    @NotNull(message = NULL_PATCH_OBJECT_REQUEST_EXCEPTION) @Validated @RequestBody RawDataStatusDto statusDto,
                                    @ModelAttribute(USER_CONTEXT) @Parameter(hidden = true)  UserContext userContext) {
-        return rawDataMapper.toRawDataDto(rawDataService.setStatus(id, statusDto.getStatus()));
+        return rawDataMapper.toRawDataDto(rawDataService.setStatus(id, statusDto.getStatus(), new Date(statusDto.getProcessedTime())));
     }
 
     @PostMapping("/{id}/error")
     public RawDataDto changeError(@NotNull(message = NULL_ID_REQUEST_EXCEPTION) @Validated @PathVariable UUID id,
                                   @NotNull(message = NULL_PATCH_OBJECT_REQUEST_EXCEPTION) @Validated @RequestBody RawDataErrorDto errorDto,
                                   @ModelAttribute(USER_CONTEXT) @Parameter(hidden = true)  UserContext userContext) {
-        return rawDataMapper.toRawDataDto(rawDataService.setError(id, errorDto.getErrorMessage()));
+        return rawDataMapper.toRawDataDto(rawDataService.setError(id, errorDto.getErrorMessage(), new Date(errorDto.getProcessedTime())));
     }
 
     @DeleteMapping("/{id}")

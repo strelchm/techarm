@@ -13,4 +13,6 @@ import javax.validation.constraints.NotNull;
 public class RawDataErrorDto {
     @NotNull
     private String errorMessage;
+    @NotNull
+    private Long processedTime;
 }

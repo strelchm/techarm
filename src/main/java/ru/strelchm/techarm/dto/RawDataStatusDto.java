@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import ru.strelchm.techarm.domain.RawDataStatus;
 
 import javax.validation.constraints.NotNull;
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -14,4 +13,6 @@ import java.util.UUID;
 public class RawDataStatusDto {
     @NotNull
     private RawDataStatus status;
+    @NotNull
+    private Long processedTime;
 }

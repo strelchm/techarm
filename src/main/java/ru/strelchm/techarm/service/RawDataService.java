@@ -19,13 +19,13 @@ public interface RawDataService {
 
     UUID add(RawDataDto rawDataDto, UserDto userDto);
 
-    RawData setStatus(RawData rawData, RawDataStatus status);
+    RawData setStatus(UUID rawDataId, RawDataStatus status, Date processedTime);
 
-    RawData setStatus(UUID rawDataId, RawDataStatus status);
+    RawData setStatus(RawData rawData, RawDataStatus status, Date processedTime);
 
-    RawData setError(RawData rawData, String errorDescription);
+    RawData setError(RawData rawData, String errorDescription, Date processedTime);
 
-    RawData setError(UUID rawDataId, String errorDescription);
+    RawData setError(UUID rawDataId, String errorDescription, Date processedTime);
 
     void delete(UUID id, UserDto userDto);
 }

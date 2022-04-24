@@ -23,6 +23,8 @@ public class RawDataDto {
 
     private String errorDescription;
 
+    private Date processedTime;
+
     private Date created;
 
     private Date updated;

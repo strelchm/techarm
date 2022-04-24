@@ -116,27 +116,29 @@ public class RawDataServiceImpl implements RawDataService {
     }
 
     @Override
-    public RawData setStatus(UUID rawDataId, RawDataStatus status) {
-        return setStatus(rawDataId, status);
+    public RawData setStatus(UUID rawDataId, RawDataStatus status, Date processedTime) {
+        return setStatus(getById(rawDataId), status, processedTime);
     }
 
     @Override
-    public RawData setStatus(RawData rawData, RawDataStatus status) {
+    public RawData setStatus(RawData rawData, RawDataStatus status, Date processedTime) {
         rawData.setStatus(status);
+        rawData.setProcessedTime(processedTime);
         return rawDataRepository.save(rawData);
     }
 
     @Override
-    public RawData setError(RawData rawData, String errorDescription) {
+    public RawData setError(RawData rawData, String errorDescription, Date processedTime) {
         rawData.setStatus(RawDataStatus.ERROR);
         rawData.setErrorDescription(errorDescription);
+        rawData.setProcessedTime(processedTime);
         return rawDataRepository.save(rawData);
     }
 
     @Override
-    public RawData setError(UUID rawDataId, String errorDescription) {
+    public RawData setError(UUID rawDataId, String errorDescription, Date processedTime) {
         RawData rawData = getRawDataById(rawDataId);
-        return setError(rawData, errorDescription);
+        return setError(rawData, errorDescription, processedTime);
     }
 
     @Override
