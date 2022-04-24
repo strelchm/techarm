@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 /**
  * Данные устройства
@@ -27,6 +28,8 @@ public class RawData extends ParentEntity {
     @JoinColumn(name = "user_id")
     @NotNull
     private User user;
+
+    private Date processedTime;
 
     private RawDataStatus status;
 

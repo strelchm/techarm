@@ -48,7 +48,7 @@ public class DeviceController extends ParentController {
     @GetMapping
     @ApiResponse(description = "Successful Operation", responseCode = "200")
     @Operation(
-            summary = "Get all users", responses = @ApiResponse(
+            summary = "Get all devices", responses = @ApiResponse(
             responseCode = "200", description = SUCCESS_MESSAGE_FIELD,
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeviceResponseListDto.class))
     ))

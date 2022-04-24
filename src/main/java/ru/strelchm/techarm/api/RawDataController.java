@@ -18,6 +18,8 @@ import ru.strelchm.techarm.service.RawDataService;
 import ru.strelchm.techarm.service.UserService;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -41,12 +43,28 @@ public class RawDataController extends ParentController {
     @GetMapping
     @ApiResponse(description = "Successful Operation", responseCode = "200")
     @Operation(
-            summary = "Get all users", responses = @ApiResponse(
+            summary = "Get all raw data", responses = @ApiResponse(
             responseCode = "200", description = SUCCESS_MESSAGE_FIELD,
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = RawDataListDto.class))
     ))
     public RawDataListDto getAllRawDatas() {
         return new RawDataListDto(rawDataService.getAll().stream().map(rawDataMapper::toRawDataDto).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/stat")
+    @ApiResponse(description = "Successful Operation", responseCode = "200")
+    @Operation(
+            summary = "Get statistics", responses = @ApiResponse(
+            responseCode = "200", description = SUCCESS_MESSAGE_FIELD,
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = RawDatasStatDto.class))
+    ))
+    public RawDatasStatDto getStatistics(@RequestParam(value = "start", required = false) Long start,
+            @RequestParam(value = "end", required = false) Long end,
+            @RequestParam(value = "deviceIds", required = false) List<UUID> deviceId) {
+        Date startDate = start == null ? null : new Date(start);
+        Date endDate = end == null ? null : new Date(end);
+        List<RawDataStatDto> statistics = rawDataService.getStatistics(startDate, endDate, deviceId);
+        return new RawDatasStatDto(startDate, endDate, statistics);
     }
 
     @GetMapping("/{id}")
