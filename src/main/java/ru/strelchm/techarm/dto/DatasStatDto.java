@@ -4,13 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RawDataListDto {
-    @NotNull
-    private List<RawDataResponseDto> raw_data;
+public class DatasStatDto {
+    private Date start;
+    private Date end;
+    private List<DataStatDto> data;
 }

@@ -7,17 +7,24 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.strelchm.techarm.domain.Device;
+import ru.strelchm.techarm.domain.RawData;
+import ru.strelchm.techarm.domain.RawDataStatus;
 import ru.strelchm.techarm.dto.*;
 import ru.strelchm.techarm.exception.AccessDeniedException;
 import ru.strelchm.techarm.mapping.RawDataMapper;
 import ru.strelchm.techarm.service.RawDataService;
 import ru.strelchm.techarm.service.UserService;
 
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Predicate;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -47,8 +54,28 @@ public class RawDataController extends ParentController {
             responseCode = "200", description = SUCCESS_MESSAGE_FIELD,
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = RawDataListDto.class))
     ))
-    public RawDataListDto getAllRawDatas() {
-        return new RawDataListDto(rawDataService.getAll().stream().map(rawDataMapper::toRawDataDto).collect(Collectors.toList()));
+    public RawDataListDto getAllRawDatas(
+            @RequestParam(value = "deviceId", required = false) String deviceId,
+            @RequestParam(value = "status", required = false) RawDataStatus status
+    ) {
+        return new RawDataListDto(rawDataService.getAll(getRawDataSpecification(deviceId, status))
+                .stream()
+                .map(rawDataMapper::toRawDataResponseDto)
+                .collect(Collectors.toList()));
+    }
+
+    Specification<RawData> getRawDataSpecification(String deviceId, RawDataStatus status) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (deviceId != null) {
+                Join<RawData, Device> deviceJoin = root.join("device");
+                predicates.add(cb.equal(deviceJoin.get("id"), UUID.fromString(deviceId)));
+            }
+            if (status != null) {
+                predicates.add(cb.equal(root.get("status"), status));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
     }
 
     @GetMapping("/stat")
@@ -68,8 +95,8 @@ public class RawDataController extends ParentController {
     }
 
     @GetMapping("/{id}")
-    public RawDataDto getRawDataById(@NotNull(message = NULL_ID_REQUEST_EXCEPTION) @Validated @PathVariable UUID id) {
-        return rawDataMapper.toRawDataDto(rawDataService.getById(id));
+    public RawDataResponseDto getRawDataById(@NotNull(message = NULL_ID_REQUEST_EXCEPTION) @Validated @PathVariable UUID id) {
+        return rawDataMapper.toRawDataResponseDto(rawDataService.getById(id));
     }
 
     @PostMapping
@@ -81,17 +108,17 @@ public class RawDataController extends ParentController {
     }
 
     @PostMapping("/{id}/status")
-    public RawDataDto changeStatus(@NotNull(message = NULL_ID_REQUEST_EXCEPTION) @Validated @PathVariable UUID id,
+    public RawDataResponseDto changeStatus(@NotNull(message = NULL_ID_REQUEST_EXCEPTION) @Validated @PathVariable UUID id,
                                    @NotNull(message = NULL_PATCH_OBJECT_REQUEST_EXCEPTION) @Validated @RequestBody RawDataStatusDto statusDto,
                                    @ModelAttribute(USER_CONTEXT) @Parameter(hidden = true)  UserContext userContext) {
-        return rawDataMapper.toRawDataDto(rawDataService.setStatus(id, statusDto.getStatus(), new Date(statusDto.getProcessedTime())));
+        return rawDataMapper.toRawDataResponseDto(rawDataService.setStatus(id, statusDto.getStatus(), new Date(statusDto.getProcessedTime())));
     }
 
     @PostMapping("/{id}/error")
-    public RawDataDto changeError(@NotNull(message = NULL_ID_REQUEST_EXCEPTION) @Validated @PathVariable UUID id,
+    public RawDataResponseDto changeError(@NotNull(message = NULL_ID_REQUEST_EXCEPTION) @Validated @PathVariable UUID id,
                                   @NotNull(message = NULL_PATCH_OBJECT_REQUEST_EXCEPTION) @Validated @RequestBody RawDataErrorDto errorDto,
                                   @ModelAttribute(USER_CONTEXT) @Parameter(hidden = true)  UserContext userContext) {
-        return rawDataMapper.toRawDataDto(rawDataService.setError(id, errorDto.getErrorMessage(), new Date(errorDto.getProcessedTime())));
+        return rawDataMapper.toRawDataResponseDto(rawDataService.setError(id, errorDto.getErrorMessage(), new Date(errorDto.getProcessedTime())));
     }
 
     @DeleteMapping("/{id}")

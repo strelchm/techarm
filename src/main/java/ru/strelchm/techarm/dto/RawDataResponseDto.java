@@ -5,17 +5,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.strelchm.techarm.domain.RawDataStatus;
 
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RawDataDto {
+public class RawDataResponseDto {
     private UUID id;
 
-    private UUID deviceId;
+    private DeviceResponseDto device;
 
     private UUID userId;
 

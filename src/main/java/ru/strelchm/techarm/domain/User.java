@@ -30,6 +30,8 @@ public class User extends ParentEntity {
     @Size(min = 8, max = 100)
     private String password;
 
+    private String name;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     private UserStatus status;

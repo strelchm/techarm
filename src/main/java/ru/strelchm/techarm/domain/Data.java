@@ -1,14 +1,12 @@
 package ru.strelchm.techarm.domain;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Данные устройства
@@ -18,26 +16,25 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "raw_data")
-public class RawData extends ParentEntity {
-    @OneToOne
+public class Data extends ParentEntity {
+    @ManyToOne
+    @JoinColumn(name = "raw_data_id")
+    @NotNull
+    private RawData rawData;
+    @ManyToOne
     @JoinColumn(name = "device_id")
     @NotNull
     private Device device;
 
-    @OneToMany(mappedBy = "rawData")
-    private List<ru.strelchm.techarm.domain.Data> parsedData;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    @NotNull
-    private User user;
-
-    private String data;
-
     private Date processedTime;
 
-    private RawDataStatus status;
+    @Enumerated(EnumType.STRING)
+    private DataType type;
 
-    private String errorDescription;
+    private String functionKey;
+
+    private String value;
+
+    @Enumerated(EnumType.STRING)
+    private RawDataStatus status;
 }

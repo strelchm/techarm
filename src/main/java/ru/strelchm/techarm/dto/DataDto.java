@@ -3,8 +3,13 @@ package ru.strelchm.techarm.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.strelchm.techarm.domain.DataType;
+import ru.strelchm.techarm.domain.Device;
+import ru.strelchm.techarm.domain.RawData;
 import ru.strelchm.techarm.domain.RawDataStatus;
 
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.UUID;
@@ -12,22 +17,16 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RawDataDto {
+public class DataDto {
     private UUID id;
 
-    private UUID deviceId;
-
-    private UUID userId;
-
-    private String data;
-
-    private RawDataStatus status;
-
-    private String errorDescription;
+    private String value;
 
     private Date processedTime;
 
-    private Date created;
+    private DataType type;
 
-    private Date updated;
+    private String functionKey;
+
+    private RawDataStatus status;
 }

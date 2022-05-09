@@ -6,11 +6,18 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RawDataListDto {
+public class DataCreateListDto {
     @NotNull
-    private List<RawDataResponseDto> raw_data;
+    private List<DataCreateDto> data;
+
+    @NotNull
+    private UUID deviceId;
+
+    @NotNull
+    private UUID rawDataId;
 }

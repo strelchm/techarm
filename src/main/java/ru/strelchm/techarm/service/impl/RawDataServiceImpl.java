@@ -1,6 +1,7 @@
 package ru.strelchm.techarm.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.Temporal;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
@@ -45,8 +46,8 @@ public class RawDataServiceImpl implements RawDataService {
     }
 
     @Override
-    public List<RawData> getAll() {
-        return rawDataRepository.findAll();
+    public List<RawData> getAll(Specification<RawData> rawDataSpecification) {
+        return rawDataRepository.findAll(rawDataSpecification);
     }
 
     @Override
@@ -99,6 +100,10 @@ public class RawDataServiceImpl implements RawDataService {
     @Override
     public UUID add(RawDataDto rawDataDto, UserDto userDto) {
         RawData rawData = rawDataMapper.fromRawDataDto(rawDataDto);
+
+        if (rawData.getData() == null) {
+            throw new BadRequestException("Data is null");
+        }
 
         Device device = deviceService.getById(rawDataDto.getDeviceId());
         if (device == null) {

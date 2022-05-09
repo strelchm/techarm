@@ -83,6 +83,9 @@ public class UserController extends ParentController {
         if (!userDto.getStatus().equals(dto.getStatus())) {
             userDto.setStatus(dto.getStatus());
         }
+        if (!userDto.getName().equals(dto.getName())) {
+            userDto.setName(dto.getName());
+        }
         return userService.edit(userDto, userContext.getUser().orElseThrow(AccessDeniedException::new));
     }
 

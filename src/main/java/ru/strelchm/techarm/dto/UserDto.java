@@ -15,6 +15,7 @@ import java.util.UUID;
 public class UserDto {
     private UUID id;
     private String login;
+    private String name;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String password;
     private UserStatus status;

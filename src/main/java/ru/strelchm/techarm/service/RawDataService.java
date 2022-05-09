@@ -1,5 +1,6 @@
 package ru.strelchm.techarm.service;
 
+import org.springframework.data.jpa.domain.Specification;
 import ru.strelchm.techarm.domain.RawData;
 import ru.strelchm.techarm.domain.RawDataStatus;
 import ru.strelchm.techarm.dto.RawDataDto;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface RawDataService {
-    List<RawData> getAll();
+    List<RawData> getAll(Specification<RawData> rawDataSpecification);
 
     List<RawDataStatDto> getStatistics(Date start, Date end, List<UUID> deviceId);
 
