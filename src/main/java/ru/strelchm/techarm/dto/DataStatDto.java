@@ -11,7 +11,5 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DataStatDto {
-    private RawDataStatus status;
     private Long count;
-    private UUID rawdeviceId;
 }

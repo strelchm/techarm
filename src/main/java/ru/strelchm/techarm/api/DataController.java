@@ -84,21 +84,22 @@ public class DataController extends ParentController {
         };
     }
 
-//    @GetMapping("/stat")
-//    @ApiResponse(description = "Successful Operation", responseCode = "200")
-//    @Operation(
-//            summary = "Get statistics", responses = @ApiResponse(
-//            responseCode = "200", description = SUCCESS_MESSAGE_FIELD,
-//            content = @Content(mediaType = "application/json", schema = @Schema(implementation = DatasStatDto.class))
-//    ))
-//    public DatasStatDto getStatistics(@RequestParam(value = "start", required = false) Long start,
-//            @RequestParam(value = "end", required = false) Long end,
-//            @RequestParam(value = "deviceIds", required = false) List<UUID> deviceId) {
-//        Date startDate = start == null ? null : new Date(start);
-//        Date endDate = end == null ? null : new Date(end);
-//        List<DataStatDto> statistics = dataService.getStatistics(startDate, endDate, deviceId);
-//        return new DatasStatDto(startDate, endDate, statistics);
-//    }
+    @GetMapping("/stat")
+    @ApiResponse(description = "Successful Operation", responseCode = "200")
+    @Operation(
+            summary = "Get statistics", responses = @ApiResponse(
+            responseCode = "200", description = SUCCESS_MESSAGE_FIELD,
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = DatasStatDto.class))
+    ))
+    public DatasStatDto getStatistics(@RequestParam(value = "start", required = false) Long start,
+                                      @RequestParam(value = "end", required = false) Long end,
+                                      @RequestParam(value = "deviceId", required = false) UUID deviceId,
+                                      @RequestParam(value = "functionKey") String functionKey) {
+        Date startDate = start == null ? null : new Date(start);
+        Date endDate = end == null ? null : new Date(end);
+        Long statistics = dataService.getStatistics(startDate, endDate, deviceId, functionKey);
+        return new DatasStatDto(startDate, endDate, List.of(new DataStatDto(statistics)));
+    }
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)

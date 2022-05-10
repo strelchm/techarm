@@ -14,7 +14,10 @@ import ru.strelchm.techarm.service.RawDataService;
 import ru.strelchm.techarm.service.UserService;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class DataServiceImpl implements DataService {
@@ -42,47 +45,52 @@ public class DataServiceImpl implements DataService {
         return dataRepository.findAll(dataSpecification);
     }
 
-//    @Override
-//    public List<RawDataStatDto> getStatistics(
-//            @Param("start") @Temporal Date start,
-//            @Param("end") @Temporal Date end,
-//            @Param("rawDataIds") List<UUID> rawDataIds
-//    ) {
-//        StringBuilder sb = new StringBuilder("SELECT new ru.strelchm.techarm.dto.RawDataStatDto(rd.status, COUNT(rd), rd.device.id) FROM RawData rd ");
-//        sb.append("WHERE ");
-//        if (start != null) {
-//            sb.append("rd.processedTime > (:start) ");
-//        }
-//        if (end != null) {
-//            if (start != null) {
-//                sb.append("AND ");
-//            }
-//            sb.append("rd.processedTime < (:end) ");
-//        }
-//        if (deviceIds != null) {
-//            if (start != null || end != null) {
-//                sb.append("AND ");
-//            }
-//            sb.append("rd.device.id IN (:deviceIds) ");
-//        } else {
-//            sb.append("rd.device.id IN (SELECT d.id FROM Device d) ");
-//        }
-//        sb.append("GROUP BY rd.status, rd.device.id ");
-//
-//        Query q = entityManager.createQuery(sb.toString(), RawDataStatDto.class);
-//        if (start != null) {
-//            q.setParameter("start", start);
-//        }
-//        if (end != null) {
-//            q.setParameter("end", end);
-//        }
-//        if (deviceIds != null) {
-//            q.setParameter("deviceIds", deviceIds);
-//        }
-//
-//
-//        return q.getResultList();
-//    }
+    @Override
+    public Long getStatistics(Date start, Date end, UUID deviceId, String functionKey) {
+        StringBuilder sb = new StringBuilder("SELECT COUNT(*) FROM data d ");
+        sb.append("WHERE ");
+        if (start != null) {
+            sb.append("d.processed_time > (:start) ");
+        }
+        if (end != null) {
+            if (start != null) {
+                sb.append("AND ");
+            }
+            sb.append("d.processed_time < (:end) ");
+        }
+        if (deviceId != null) {
+            if (start != null || end != null) {
+                sb.append("AND ");
+            }
+            sb.append("d.device_id = :deviceId ");
+        } else {
+            sb.append("d.device_id IN (SELECT d.id FROM device d) ");
+        }
+        if(functionKey != null) {
+            if (start != null || end != null || deviceId != null) {
+                sb.append("AND ");
+            }
+            sb.append("d.function_key = (:functionKey) ");
+        }
+        sb.append("GROUP BY d.device_id, d.functionKey ");
+
+        Query q = entityManager.createNativeQuery(sb.toString(), Long.class);
+        if (start != null) {
+            q.setParameter("start", start);
+        }
+        if (end != null) {
+            q.setParameter("end", end);
+        }
+        if (deviceId != null) {
+            q.setParameter("deviceId", deviceId);
+        }
+
+        if (functionKey != null) {
+            q.setParameter("functionKey", functionKey);
+        }
+
+        return (Long) q.getSingleResult();
+    }
 
     @Override
     public List<Data> add(DataCreateListDto dataDto) {
@@ -103,10 +111,4 @@ public class DataServiceImpl implements DataService {
 
         return dataRepository.saveAll(data);
     }
-
-//    @Override
-//    public void delete(UUID id, UserDto userDto) {
-//        RawData device = getRawDataById(id);
-//        dataRepository.delete(device);
-//    }
 }
